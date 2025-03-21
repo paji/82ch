@@ -1,52 +1,55 @@
-name: YouTube過去配信取得
+name: YouTube Livestream Transcript Extractor
 
 on:
   schedule:
-    # 毎日午前3時に実行（UTC）
-    - cron: '0 3 * * *'
-  workflow_dispatch:
-    # 手動実行用
-
-# リポジトリへの書き込み権限を付与
-permissions:
-  contents: write
+    # 毎時0分に実行
+    - cron: '0 * * * *'
+  workflow_dispatch:  # 手動実行用
 
 jobs:
-  extract_livestreams:
+  extract-transcript:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: リポジトリのチェックアウト
+      - name: Checkout youtube_text repository
         uses: actions/checkout@v3
-      
-      - name: Python環境のセットアップ
+        with:
+          repository: paji/youtube_text
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: youtube_text
+
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      
-      - name: 依存関係のインストール
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install google-api-python-client google-auth google-auth-httplib2 google-auth-oauthlib requests
-      
-      - name: 過去配信一覧の取得
-        run: |
-          # ファイルの存在を確認
-          ls -la
-          # 正しいファイル名で実行し、直接チャンネルIDを指定
-          python youtube_livestream_extractor.py --channel-id UCYQ1MkR00l647L23RpJM-8g --output livestreams.json
+          pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib requests
+
+      - name: Fetch extractor script
+        uses: actions/checkout@v3
+        with:
+          repository: paji/82ch
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: 82ch
+          sparse-checkout: |
+            youtube_livestream_extractor.py
+            livestreams.json
+
+      - name: Run transcript extractor
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-      
-      - name: 変更をコミット
         run: |
+          cd 82ch
+          python youtube_livestream_extractor.py
+
+      - name: Commit changes if any
+        run: |
+          cd youtube_text
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add livestreams.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "過去配信一覧を更新 $(date '+%Y-%m-%d')"
-      
-      - name: 変更をプッシュ
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -m "Add new transcript via GitHub Actions"
+          git push
