@@ -1,7 +1,7 @@
 # サンプル動画タイトル
 
 Video ID: sample_video_id
-Transcribed at: 2025-03-22 02:58:24
+Transcribed at: 2025-03-22 03:24:27
 
 ## Transcript
 
@@ -10,10 +10,9 @@ Transcribed at: 2025-03-22 02:58:24
 実際のYouTube APIからの文字起こしが取得できなかったため、このサンプルファイルが生成されました。
 
 考えられる原因:
-1. YouTube APIキーが正しく設定されていない
-2. 対象の動画に字幕が存在しない
-3. APIのクォータ制限に達した
-4. livestreams.jsonファイルの形式が想定と異なる
+1. 対象の動画に字幕が存在しない
+2. youtube-transcript-apiでエラーが発生した
+3. livestreams.jsonファイルの形式が想定と異なる
 
 ログファイルを確認して、詳細なエラー情報を確認してください。
 
