@@ -1,7 +1,7 @@
 # サンプル動画タイトル
 
 Video ID: sample_video_id
-Transcribed at: 2025-03-22 12:29:35
+Transcribed at: 2025-03-22 13:19:49
 
 ## Transcript
 
